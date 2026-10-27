@@ -1,0 +1,49 @@
+{
+ "title": "What if Enthiran's super-robot spent ONE May afternoon in Chennai?",
+ "total": 37.5,
+ "voice": {
+  "name": "hm_psi",
+  "pitch": 1.4,
+  "speed": 1.17
+ },
+ "theme": "Spice Market",
+ "theme_css": "",
+ "lines": [
+  {
+   "text": "What if Enthiran's super-robot spent ONE May afternoon in Chennai?",
+   "pause": 0.35
+  },
+  {
+   "text": "Whiskers here... and I checked!",
+   "pause": 0.45
+  },
+  {
+   "text": "Ten A.M.: he lifts a car with one hand. Mass!",
+   "pause": 0.45
+  },
+  {
+   "text": "Twelve noon: his head is so hot, the neighbour makes a dosa on it.",
+   "pause": 0.5
+  },
+  {
+   "text": "Two P.M.: forget villains. He's fighting ME for the spot under the ceiling fan!",
+   "pause": 0.45
+  },
+  {
+   "text": "Uh-oh! New message: Robot overheated. Please try again in November.",
+   "pause": 0.5
+  },
+  {
+   "text": "I fanned him with my ears... now I'm a toasted bunny.",
+   "pause": 0.55
+  },
+  {
+   "text": "So, why so? An iPhone is designed for weather up to thirty-five degrees. Chennai has hit almost forty-three!",
+   "pause": 0.5
+  },
+  {
+   "text": "Tag the friend who melts by ten A.M.!",
+   "pause": 0.2
+  }
+ ]
+}

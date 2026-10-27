@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<script src="gsap.min.js"></script>
+<style>
+  @font-face { font-family: "Baloo"; src: url("fonts/baloo-2-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+  @font-face { font-family: "Baloo"; src: url("fonts/baloo-2-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Noto Color Emoji"; src: local("Noto Color Emoji"); }
+  :root {
+    /* Theme slots. Every reel overrides these with its colour theme (reel.json "theme_css"). */
+    --bg1: #F4B41A; --bg2: #6E9F4F; --bg3: #D7263D; --accent: #D7263D; --accent2: #2BB3A3;
+    --cream: #FFF4DC; --ink: #2B1B12;
+    /* legacy names used by the Enthiran example */
+    --turmeric: #F4B41A; --chilli: #D7263D; --cardamom: #6E9F4F; --maroon: #4A1420; --teal: #2BB3A3;
+  }
+  __THEME_CSS__
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg1); }
+  #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: "Baloo", "Noto Color Emoji", sans-serif; color: var(--ink); }
+  #world { position: absolute; inset: 0; }
+  .scene { position: absolute; inset: 0; overflow: hidden; }
+  .abs { position: absolute; }
+  .card { background: var(--cream); border: 8px solid var(--ink); border-radius: 36px; box-shadow: 0 14px 0 var(--ink); }
+  .hl { color: var(--accent); }
+  .hl2 { color: var(--accent2); }
+  .burst { position: absolute; left: 540px; top: 900px; width: 2600px; height: 2600px; margin: -1300px 0 0 -1300px; }
+  .title { left: 56px; right: 56px; top: 270px; padding: 26px 34px 30px; font-weight: 800; font-size: 88px; line-height: 1.02; text-align: center; transform: rotate(-2deg); }
+  .title .small { display: block; font-size: 64px; color: var(--accent); letter-spacing: 2px; }
+  .clock { left: 60px; top: 280px; padding: 10px 34px 14px; font-weight: 800; font-size: 76px; }
+  .stamp { font-weight: 800; font-size: 104px; color: var(--accent); border: 10px solid var(--accent); border-radius: 26px; padding: 6px 30px 12px; background: rgba(255,244,220,0.92); white-space: nowrap; }
+  .pop { position: absolute; font-weight: 800; font-size: 128px; line-height: 1; color: var(--accent); -webkit-text-stroke: 14px #FFFFFF; paint-order: stroke fill; text-shadow: 0 12px 0 var(--ink); white-space: nowrap; }
+  .cap { position: absolute; left: 60px; right: 60px; top: 1392px; padding: 16px 30px 20px; font-weight: 800; font-size: 56px; line-height: 1.08; text-align: center; background: var(--cream); border: 7px solid var(--ink); border-radius: 30px; box-shadow: 0 10px 0 var(--ink); }
+  #wk-wrap { position: absolute; left: 0; top: 0; width: 440px; height: 680px; z-index: 5; }
+  #pops { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+  #caps { position: absolute; inset: 0; z-index: 10; }
+  .road { position: absolute; left: 0; right: 0; top: 1080px; height: 140px; background: #7A6A5C; border-top: 8px solid var(--ink); border-bottom: 8px solid var(--ink); }
+  .road::after { content: ""; position: absolute; left: 0; right: 0; top: 60px; height: 14px; background: repeating-linear-gradient(90deg, #FFF4DC 0 90px, transparent 90px 170px); }
+  .floor { position: absolute; left: 0; right: 0; top: 1100px; height: 300px; background: var(--bg2); border-top: 8px solid var(--ink); }
+  .haze { position: absolute; width: 18px; height: 120px; border-radius: 9px; background: rgba(255,255,255,0.45); }
+  .follow { left: 90px; right: 90px; top: 610px; padding: 20px 30px 26px; text-align: center; font-weight: 800; font-size: 60px; line-height: 1.1; background: var(--accent); color: #FFF4DC; }
+  __EXTRA_CSS__
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="__TOTAL__" data-width="1080" data-height="1920">
+<div id="world">
+__SCENES__
+  <!-- Whiskers (persistent narrator, same in every reel) -->
+  <div id="wk-wrap" class="clip" data-start="0" data-duration="__TOTAL__">__WHISKERS__</div>
+  <!-- pop-up reaction words -->
+  <div id="pops">
+__POPS__
+  </div>
+</div>
+<!-- captions -->
+<div id="caps">
+__CAPTIONS__
+</div>
+</div>
+
+<script>
+const D = __DATA__;
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+const T = D.total;
+const L = D.lines;  // voice lines: L[i].start / L[i].end in seconds
+
+// ---------- helpers (use these in scenes.js) ----------
+// place Whiskers so his bottom-centre (feet) lands on (px, py) at scale s; animated if dur given
+function place(t, px, py, s, dur) {
+  const v = { x: px - 220 * s, y: py - 680 * s, scale: s };
+  if (dur) tl.to("#wk-wrap", Object.assign(v, { duration: dur, ease: "back.out(1.6)" }), t);
+  else tl.set("#wk-wrap", v, t);
+}
+function wx(px, s) { return px - 220 * s; }   // raw x for #wk-wrap tweens
+function wy(py, s) { return py - 680 * s; }   // raw y for #wk-wrap tweens
+function shake(t, amt) {
+  amt = amt || 18;
+  const seq = [amt, -amt * 0.8, amt * 0.6, -amt * 0.4, amt * 0.2, 0];
+  seq.forEach((x, i) => tl.to("#world", { x: x, y: (i % 2 ? -1 : 1) * amt * 0.3, duration: 0.04, ease: "none" }, t + i * 0.04));
+  tl.set("#world", { y: 0 }, t + seq.length * 0.04);
+}
+function punch(sel, t) { tl.fromTo(sel, { scale: 1.0 }, { scale: 1.07, duration: 0.08, yoyo: true, repeat: 1, ease: "power2.out" }, t); }
+function pop(sel, t) { tl.fromTo(sel, { scale: 0.15, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.32, ease: "back.out(3)" }, t); }
+function whip(sel, t) { tl.fromTo(sel, { x: 1080 }, { x: 0, duration: 0.22, ease: "power4.out" }, t); }
+function stampIn(sel, t, rot) { tl.fromTo(sel, { scale: 3, opacity: 0 }, { scale: 1, opacity: 1, rotation: rot || -6, duration: 0.25, ease: "power4.in" }, t); }
+function earWiggle(t, n) {
+  n = n || 3;
+  tl.to("#wk-earL", { rotation: -12, duration: 0.07, yoyo: true, repeat: n, ease: "sine.inOut" }, t);
+  tl.to("#wk-earR", { rotation: 12, duration: 0.07, yoyo: true, repeat: n, ease: "sine.inOut" }, t);
+}
+function shock(t, hold) {   // jaw-drop double-take: pupils pop, ears shoot up, little jump
+  tl.to(".wk-pupil", { scale: 1.5, duration: 0.08, ease: "back.out(4)" }, t);
+  tl.to("#wk-earL", { rotation: 14, duration: 0.1 }, t);
+  tl.to("#wk-earR", { rotation: -40, duration: 0.1 }, t);
+  tl.to("#wk-browL", { y: -16, duration: 0.1 }, t);
+  tl.to("#wk-browR", { y: -16, duration: 0.1 }, t);
+  tl.to("#wk-all", { y: -40, duration: 0.1, yoyo: true, repeat: 1, ease: "power2.out" }, t);
+  const e = t + (hold || 0.9);
+  tl.to(".wk-pupil", { scale: 1, duration: 0.15 }, e);
+  tl.to(["#wk-earL", "#wk-earR"], { rotation: 0, duration: 0.2 }, e);
+  tl.to(["#wk-browL", "#wk-browR"], { y: 0, duration: 0.2 }, e);
+}
+function smug(t, d) {   // raised brow + glasses push
+  tl.to("#wk-browL", { rotation: -12, y: 6, duration: 0.12 }, t);
+  tl.to("#wk-browR", { rotation: 12, y: -6, duration: 0.12 }, t);
+  tl.to("#wk-glasses", { y: -10, duration: 0.1, yoyo: true, repeat: 1 }, t + 0.1);
+  tl.to(["#wk-browL", "#wk-browR"], { rotation: 0, y: 0, duration: 0.15 }, t + d);
+}
+function cry(t, d) { tl.set("#wk-tears", { opacity: 1 }, t); tl.set("#wk-tears", { opacity: 0 }, t + d); }
+function sweat(t, d) {
+  tl.set("#wk-sweat", { opacity: 1 }, t); tl.set("#wk-sweat", { opacity: 0 }, t + d);
+  tl.fromTo("#wk-sweat .drop", { y: 0 }, { y: 40, duration: 0.6, repeat: Math.max(0, Math.round(d / 0.6) - 1), ease: "power1.in", stagger: 0.2 }, t);
+}
+function smoke(t, d) {
+  tl.to("#wk-smoke", { opacity: 1, duration: 0.2 }, t);
+  tl.fromTo("#wk-smoke circle", { y: 0 }, { y: -50, duration: 0.6, repeat: 2, stagger: 0.12, ease: "sine.out" }, t);
+  tl.to("#wk-smoke", { opacity: 0, duration: 0.3 }, t + d);
+}
+function wave(t, n) { tl.to("#wk-armL", { rotation: 55, duration: 0.18, yoyo: true, repeat: n || 9, ease: "sine.inOut" }, t); }
+function fanFrantic(t, d) { tl.to("#wk-armR", { rotation: -25, duration: 0.06, yoyo: true, repeat: Math.round(d / 0.06), ease: "none" }, t); }
+function show(sel, t, on) { tl.set(sel, { opacity: on ? 1 : 0 }, t); }
+
+// ---------- Whiskers rig origins (set once, before any tween; never put transformOrigin/svgOrigin inside tweens) ----------
+gsap.set("#wk-wrap", { transformOrigin: "0 0" });
+gsap.set("#wk-head", { svgOrigin: "200 330" });
+gsap.set("#wk-all", { svgOrigin: "200 575" });
+gsap.set("#wk-mouth", { svgOrigin: "200 272", scaleY: 0.06 });
+gsap.set("#wk-earL", { svgOrigin: "150 120" });
+gsap.set("#wk-earR", { svgOrigin: "250 120" });
+gsap.set("#wk-armL", { svgOrigin: "112 372" });
+gsap.set("#wk-armR", { svgOrigin: "288 365" });
+gsap.set("#wk-blades", { svgOrigin: "358 250" });
+gsap.set(".wk-pupil", { transformOrigin: "50% 50%" });
+gsap.set(["#wk-browL", "#wk-browR"], { transformOrigin: "50% 50%" });
+// prop origins (props.py parts)
+gsap.set(".rb-armR", { svgOrigin: "300 250" });
+gsap.set(".rb-armL", { svgOrigin: "60 250" });
+gsap.set(".rb-head", { svgOrigin: "180 210" });
+gsap.set(".cf-blades", { svgOrigin: "300 300" });
+gsap.set(".sun-rays", { svgOrigin: "150 150" });
+gsap.set(".batter", { svgOrigin: "430 132" });
+gsap.set(".rb-dosa", { svgOrigin: "180 34" });
+gsap.set(".merc", { svgOrigin: "160 610" });
+gsap.set("#wk-wrap", { x: 330 - 220 * 0.85, y: 1390 - 680 * 0.85, scale: 0.85 });
+
+// ---------- always-on ----------
+tl.to("#wk-blades", { rotation: 360 * 40, duration: T, ease: "none" }, 0);
+tl.to(".burst", { rotation: 40, duration: T, ease: "none" }, 0);
+for (let t = 0; t < T; t += 0.5) tl.to("#wk-all", { scaleY: 0.97, scaleX: 1.02, duration: 0.25, yoyo: true, repeat: 1, ease: "sine.inOut" }, t);
+
+// ---------- lip sync + head bob from the voice envelope ----------
+D.env.forEach((v, i) => {
+  const t = i / 30;
+  tl.set("#wk-mouth", { scaleY: 0.06 + 0.94 * v }, t);
+  if (i % 3 === 0) tl.set("#wk-head", { rotation: (v - 0.25) * 6 }, t);
+});
+
+// ================= scene-specific timeline =================
+__SCENE_JS__
+// ===========================================================
+
+// ---------- captions ----------
+D.caps.forEach((c) => tl.fromTo("#" + c.id, { scale: 0.85, y: 20 }, { scale: 1, y: 0, duration: 0.22, ease: "back.out(2.2)" }, c.start));
+
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>

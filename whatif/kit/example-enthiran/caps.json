@@ -1,0 +1,68 @@
+[
+ {
+  "id": "c1",
+  "start": 4.25,
+  "end": 6.2,
+  "html": "Whiskers here… and I <span class='hl'>checked!</span> 🧐"
+ },
+ {
+  "id": "c2",
+  "start": 6.25,
+  "end": 9.6,
+  "html": "10 AM: he lifts a car with <span class='hl'>one hand.</span> MASS! 😎"
+ },
+ {
+  "id": "c3",
+  "start": 9.7,
+  "end": 13.55,
+  "html": "12 noon: his head is so hot, the neighbour makes a <span class='hl'>dosa on it</span> 🔥"
+ },
+ {
+  "id": "c4a",
+  "start": 13.7,
+  "end": 15.2,
+  "html": "2 PM: forget villains."
+ },
+ {
+  "id": "c4b",
+  "start": 15.2,
+  "end": 18.35,
+  "html": "He's fighting <span class='hl'>ME</span> for the spot under the ceiling fan! 😤"
+ },
+ {
+  "id": "c5a",
+  "start": 18.45,
+  "end": 19.1,
+  "html": "Uh-oh! 😱"
+ },
+ {
+  "id": "c5b",
+  "start": 19.1,
+  "end": 22.85,
+  "html": "“Robot overheated. Please try again in <span class='hl'>November.</span>”"
+ },
+ {
+  "id": "c6",
+  "start": 23.0,
+  "end": 26.25,
+  "html": "I fanned him with my ears… now I'm a <span class='hl'>toasted bunny</span> 🐰🔥"
+ },
+ {
+  "id": "c7a",
+  "start": 26.4,
+  "end": 27.35,
+  "html": "So, why so? 🤔"
+ },
+ {
+  "id": "c7b",
+  "start": 27.35,
+  "end": 30.75,
+  "html": "An iPhone is designed for weather up to <span class='hl2'>35°C</span>…"
+ },
+ {
+  "id": "c7c",
+  "start": 30.75,
+  "end": 33.35,
+  "html": "…and Chennai has hit almost <span class='hl'>43°C!</span> 🥵"
+ }
+]
